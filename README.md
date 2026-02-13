@@ -55,7 +55,7 @@ Music_One_F/
 ├── syn_pitch.py           # ピッチ変調モジュール（可変速リサンプリング）
 ├── syn_timbre.py          # 音色変調モジュール（filtfiltゼロ位相フィルタ）
 └── syn_reverb.py          # 残響変調モジュール（IR自動生成とFFT畳み込み）
-
+```
 ## 💻 開発環境 (Development Environment)
 * **OS:** Windows 11
 * **Language:** Python 3.13
