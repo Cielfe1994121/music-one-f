@@ -2,35 +2,58 @@ from gui_play import gui_play as gp
 import one_f_generator as ofg
 import librosa
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class syn_vol:
     def get_file_path(self):
         self.file = gp()
         self.file_path = self.file.gui_get_music()
-        self.data, self.sr = librosa.load(self.file_path, sr=None, duration=180)
-        print(self.data)
-        self.one_f = ofg.generate_one_f(len(self.data))
-        self.one_f_data = self.data * self.one_f.ifft_real_result
-        # self.file.play_from_array(self.one_f_data, self.sr)
+        # 他のクラスと統一してステレオ(mono=False)で読み込む
+        self.data, self.sr = librosa.load(
+            self.file_path, mono=False, sr=None, duration=180
+        )
+        return self.data, self.sr
 
-    def get_beaf(self):
-        self.be = self.data
-        self.af = self.one_f_data
-        return self.be, self.af
+    def syn_vol(self, data, sr):
+        # 1. 安全装置：モノラル対策
+        if data.ndim == 1:
+            data = np.vstack([data, data])
+        elif np.mean(np.abs(data[1])) < 0.0001:
+            # print("Mono source detected! Copying Left to Right...")
+            data[1] = data[0].copy()
+
+        length = data.shape[1]
+        self.one_f = ofg.generate_one_f(length)
+
+        # 2. 音量揺らぎの適用
+        # そのまま掛けると音量が大きくなりすぎる場合があるので、
+        # 必要に応じてここで係数を調整してもOKです。
+        # 例: multiplier = (self.one_f.ifft_real_result - 1) * 0.5 + 1
+
+        multiplier = self.one_f.ifft_real_result
+
+        # ステレオデータの全要素に掛け算
+        # shapeが違う(2行 vs 1行)ので、numpyが自動で各行に掛けてくれます
+        vol_data = data * multiplier
+
+        return vol_data
 
     def vid(self, be, af):
+        # 1秒分だけ表示
         self.limit = int(1 * self.sr)
         fig, ax = plt.subplots(3, 1, sharex=True)
 
-        ax[0].plot(be[: self.limit], label="Before", color="tab:blue")
-        ax[1].plot(af[: self.limit], label="After", color="tab:orange")
+        # ステレオ対応：左チャンネル[0]だけをプロット
+        ax[0].plot(be[0, : self.limit], label="Before", color="tab:blue")
+        ax[1].plot(af[0, : self.limit], label="After", color="tab:orange")
 
-        ax[2].plot(be[: self.limit], label="Before", color="tab:blue", alpha=1)
-        ax[2].plot(af[: self.limit], label="After", color="tab:orange", alpha=0.5)
+        ax[2].plot(be[0, : self.limit], label="Before", color="tab:blue", alpha=1)
+        ax[2].plot(af[0, : self.limit], label="After", color="tab:orange", alpha=0.5)
 
         for a in ax:
-            a.set_ylim(-0.01, 0.01)
+            # ズームは自動
+            # a.set_ylim(-0.01, 0.01)
             a.legend(loc="upper right")
             a.grid(True, linestyle="--", alpha=0.5)
 
@@ -39,6 +62,18 @@ class syn_vol:
 
 if __name__ == "__main__":
     syn = syn_vol()
-    syn_play = syn.get_file_path()
-    syn_be, syn_af = syn.get_beaf()
-    syn_vid = syn.vid(syn_be, syn_af)
+
+    # 1. 読み込み
+    data, sr = syn.get_file_path()
+
+    # 比較用にコピーをとっておく
+    be = data.copy()
+
+    # 2. 加工
+    af = syn.syn_vol(data, sr)
+
+    # 3. 表示
+    syn.vid(be, af)
+
+    # 再生
+    # syn.file.play_from_array(af.T, sr)
