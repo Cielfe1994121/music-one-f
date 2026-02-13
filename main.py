@@ -1,5 +1,6 @@
 from gui_play import gui_play as gp
 import librosa
+import numpy as np
 
 # インポート（ここは現状のファイル名とクラス名に合わせています）
 from syn_volume import syn_volume
@@ -20,25 +21,35 @@ if __name__ == "__main__":
     # 1. Volume (メソッド名が syn_vol のはず)
     vol_inst = syn_volume()
     data = vol_inst.syn_vol(data, sr)
+    data = data / np.max(np.abs(data))
+    print("volumeを1/fに乗せてる")
 
     # 2. Pan (メソッド名が syn_pan のはず)
     pan_inst = syn_pan()
     data = pan_inst.syn_pan(data, sr)
+    data = data / np.max(np.abs(data))
+    print("panを1/fに乗せてる")
 
     # 3. Pitch
     # 【修正箇所】エラー通り、メソッド名を syn_pit に合わせる！
     pit_inst = syn_pitch()
     data = pit_inst.syn_pit(data, sr)  # syn_pitch ではなく syn_pit
+    data = data / np.max(np.abs(data))
+    print("pitchを1/fに乗せてる")
 
     # 4. Timbre
     # 【修正箇所】ここもおそらく syn_tim になっているはず！
     tim_inst = syn_timbre()
     data = tim_inst.syn_tim(data, sr)  # syn_timbre ではなく syn_tim
+    data = data / np.max(np.abs(data))
+    print("timbreを1/fに乗せてる")
 
     # 5. Reverb
     # 【修正箇所】ここもおそらく syn_rev になっているはず！
     rev_inst = syn_reverb()
     data = rev_inst.syn_rev(data, sr)  # syn_reverb ではなく syn_rev
+    data = data / np.max(np.abs(data))
+    print("reverbを1/fに乗せてる")
 
     print("Playing...")
     player.play_from_array(data.T, sr)

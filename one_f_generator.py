@@ -35,7 +35,7 @@ class generate_one_f:
         self.random_sqrt = self.fft_result_Numpy / np.sqrt(self.freqs)
 
         self.ifft_result = np.array(np.fft.ifft(self.random_sqrt))
-        self.ifft_real_result = self.ifft_result.real * 500 + 1
+        self.ifft_real_result = self.ifft_result.real * 100 + 1
 
         print(self.ifft_real_result)
 

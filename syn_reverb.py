@@ -40,7 +40,7 @@ class syn_reverb:
         # -----------------------------------------------------
         # 3. 畳み込み（Convolution）でWet音作成
         # -----------------------------------------------------
-        print("Convolving reverb... (Please wait)")
+        # print("Convolving reverb... (Please wait)")
         wet_signal = np.zeros_like(data)
 
         # 左右それぞれ計算
