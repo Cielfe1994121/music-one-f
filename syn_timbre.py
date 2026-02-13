@@ -15,7 +15,7 @@ class syn_timbre:
         )
         return self.data, self.sr
 
-    def syn_timbre(self, data, sr):
+    def syn_tim(self, data, sr):
         # 1. 安全装置：モノラル対策
         if data.ndim == 1:
             data = np.vstack([data, data])
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     # 2. 加工
     # 戻り値（加工後のデータ）を受け取る
-    af = syn.syn_timbre(data, sr)
+    af = syn.syn_tim(data, sr)
 
     # 3. 表示
     syn.vid(be, af)

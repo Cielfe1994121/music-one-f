@@ -15,7 +15,7 @@ class syn_pitch:
         )
         return self.data, self.sr
 
-    def syn_pitch(self, data, sr):
+    def syn_pit(self, data, sr):
         # 1. 安全装置：モノラル対策
         if data.ndim == 1:
             data = np.vstack([data, data])
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     data, sr = syn.get_file_path()
 
     # 2. 加工（戻り値で上書き）
-    data = syn.syn_pitch(data, sr)
+    data = syn.syn_pit(data, sr)
 
     # 3. 表示
     syn.vid(data[0], data[1])

@@ -1,60 +1,44 @@
 from gui_play import gui_play as gp
-import librosa  # 読み込み用
+import librosa
 
-# 【修正1】クラスを直接指名してインポートする
-from syn_volume import syn_vol
+# インポート（ここは現状のファイル名とクラス名に合わせています）
+from syn_volume import syn_volume
 from syn_pan import syn_pan
-from syn_pitch import syn_pit
-from syn_timbre import syn_tim
-from syn_reverb import syn_rev
+from syn_pitch import syn_pitch
+from syn_timbre import syn_timbre
+from syn_reverb import syn_reverb
 
 if __name__ == "__main__":
-    # 1. プレイヤー準備 & ファイル選択
     player = gp()
     file_path = player.gui_get_music()
-
     if not file_path:
-        print("No file selected.")
         exit()
 
-    # 2. ここで一回だけ読み込む（これが最初の素材）
-    print("Loading music... (Stereo)")
-    # mono=Falseを忘れずに！
+    print("Loading music...")
     data, sr = librosa.load(file_path, mono=False, sr=None, duration=180)
 
-    # -------------------------------------------------
-    # 3. 究極のバケツリレー開始
-    # -------------------------------------------------
+    # 1. Volume (メソッド名が syn_vol のはず)
+    vol_inst = syn_volume()
+    data = vol_inst.syn_vol(data, sr)
 
-    # 第1走者：Volume（音量）
-    print("Applying 1/f Volume...")
-    vol = syn_vol()
-    data = vol.syn_vol(data, sr)  # dataを上書きしていく
+    # 2. Pan (メソッド名が syn_pan のはず)
+    pan_inst = syn_pan()
+    data = pan_inst.syn_pan(data, sr)
 
-    # 第2走者：Pan（左右）
-    print("Applying 1/f Pan...")
-    pan = syn_pan()
-    data = pan.syn_pan(data, sr)
+    # 3. Pitch
+    # 【修正箇所】エラー通り、メソッド名を syn_pit に合わせる！
+    pit_inst = syn_pitch()
+    data = pit_inst.syn_pit(data, sr)  # syn_pitch ではなく syn_pit
 
-    # 第3走者：Pitch（音程・テープ伸び）
-    print("Applying 1/f Pitch...")
-    pit = syn_pitch()
-    data = pit.syn_pitch(data, sr)
+    # 4. Timbre
+    # 【修正箇所】ここもおそらく syn_tim になっているはず！
+    tim_inst = syn_timbre()
+    data = tim_inst.syn_tim(data, sr)  # syn_timbre ではなく syn_tim
 
-    # 第4走者：Timbre（音色・こもり）
-    print("Applying 1/f Timbre...")
-    tim = syn_timbre()
-    data = tim.syn_timbre(data, sr)
+    # 5. Reverb
+    # 【修正箇所】ここもおそらく syn_rev になっているはず！
+    rev_inst = syn_reverb()
+    data = rev_inst.syn_rev(data, sr)  # syn_reverb ではなく syn_rev
 
-    # アンカー：Reverb（空間・残響）
-    # ※重いので最後にやるのがセオリー
-    print("Applying 1/f Reverb... (This may take time)")
-    rev = syn_reverb()
-    data = rev.syn_reverb(data, sr)
-
-    # -------------------------------------------------
-    # 4. 再生
-    # -------------------------------------------------
-    print("Playing generated chill music...")
-    # 再生時は転置(.T)が必要
+    print("Playing...")
     player.play_from_array(data.T, sr)

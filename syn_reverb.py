@@ -16,7 +16,7 @@ class syn_reverb:
         )
         return self.data, self.sr
 
-    def syn_reverb(self, data, sr):
+    def syn_rev(self, data, sr):
         # 1. 安全装置：モノラル対策
         if data.ndim == 1:
             data = np.vstack([data, data])
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     be = data.copy()
 
     # 2. 加工（少し時間がかかります）
-    af = syn.syn_reverb(data, sr)
+    af = syn.syn_rev(data, sr)
 
     # 3. 表示
     syn.vid(be, af)
