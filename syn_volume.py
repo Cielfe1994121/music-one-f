@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class syn_vol:
+class syn_volume:
     def get_file_path(self):
         self.file = gp()
         self.file_path = self.file.gui_get_music()
@@ -61,7 +61,7 @@ class syn_vol:
 
 
 if __name__ == "__main__":
-    syn = syn_vol()
+    syn = syn_volume()
 
     # 1. 読み込み
     data, sr = syn.get_file_path()
